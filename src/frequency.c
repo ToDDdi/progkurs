@@ -7,13 +7,14 @@
 void print_tree(struct words *head) {
     if(head == NULL)
         return ;
-    print_tree(head->right); //note that print_tree uses the post order traversal to print the tree
-    printf("|%-20s | %-5d |\n",head->word,head->count);
+    print_tree(head->right); //использует обход в глубину
+    if(head->count >= 2) {
+	printf("|%-20s | %-5d |\n",head->word,head->count);
+    }
     print_tree(head->left);
     return ;   
 }
 
-//char *printin (struct words *word, struct words)
 char *readfile(char *filename) {
     FILE *fp = fopen(filename,"r");
     if(fp == NULL)
@@ -23,11 +24,11 @@ char *readfile(char *filename) {
     }
     char *str=NULL;
     if(fp !=NULL){
-        fseek(fp,0,SEEK_END); //moves the pointer 2 the end of the file
-        long int size = ftell(fp); //ftel determine the size of the file
-        rewind(fp); //rewind brings the pointer back to te beginning
+        fseek(fp,0,SEEK_END); //перемещает указатель в конец файла
+        long int size = ftell(fp); //определяет размер файла
+        rewind(fp); //возвращает указатель обратно к началу
         str = malloc(size + 1);
-        fread(str,size,1,fp); //fread read the the entire file and stores it in a file.the 1 signifies it is reading the entire file as one block
+        fread(str,size,1,fp); //Fread читает весь файл и сохраняет его в файле. 1 означает, что он считывает весь файл как один блок
         fclose(fp);
     }
     return str;
@@ -36,14 +37,14 @@ char *readfile(char *filename) {
 struct words *bintree(struct words **head,char *word) {
     
 	if(*head == NULL){
-        *head = malloc(sizeof(struct words *));//allocate space for the words
+        *head = malloc(sizeof(struct words *));//Выделение места для слов
         (*head)->word = malloc(sizeof(char) * strlen(word) + 1);
         strcpy((*head)->word,word);
         (*head)->count = 1;
         (*head)->left = (*head)->right = NULL;
         total++;
     }
-    else if(strcasecmp((*head)->word,word) < 0) { //strcasecmp compares without considering the cases
+    else if(strcasecmp((*head)->word,word) < 0) { //Сравнивает без рассмотрения случаев
         bintree(&(*head)->left,word);
     }
     else if(strcasecmp((*head)->word,word) > 0) {
@@ -57,6 +58,3 @@ struct words *bintree(struct words **head,char *word) {
 
 } 
 
-/*To compile the file just do gcc -o frequency frequency.c
-
-To run the file, just do ./frequency  the-name-of-the-file-you-want-to-count-the-words*/
