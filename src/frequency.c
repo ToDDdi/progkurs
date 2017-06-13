@@ -4,15 +4,73 @@
 #include <locale.h>
 #include "frequency.h"
 
-void print_tree(struct words *head) {
-    if(head == NULL)
-        return ;
-    print_tree(head->right); //использует обход в глубину
-    if(head->count >= 2) {
-	printf("|%-20s | %-5d |\n",head->word,head->count);
+struct hash_tab
+{
+    char *data;
+    struct hash_tab *next;
+};
+
+struct hash_tab **table;
+
+void hash_tab_add(int id, char *data)
+{
+    if (table != NULL)
+    {
+        struct hash_tab *newElement = (struct hash_tab*)malloc(sizeof(struct hash_tab));
+        if (newElement != NULL)
+        {
+            newElement->data = data;
+            newElement->next = table[id] ? table[id] : NULL;
+            table[id] =  newElement;
+        }
     }
-    print_tree(head->left);
-    return ;   
+}
+
+void _print_tree(struct words *head, int total)
+{
+    if (head == NULL)
+        return ;
+    _print_tree(head->right, total);
+    int id = head->count % total;
+    if (head->count >= 2) {
+    hash_tab_add(id, head->word);
+}
+    _print_tree(head->left, total);
+
+}
+
+void print_table(FILE *fout, int total)
+{
+    if (table)
+    {
+        if (table[0] != NULL)
+        {
+            fprintf(fout, "|%-20s | %-5d |\n", table[0]->data, total);
+        }
+        else
+        {
+            int id = total - 1;
+            for (; id > 0; --id)
+            {
+                struct hash_tab *val = table[id];
+                while(val != NULL)
+                {
+                    fprintf(fout, "|%-20s | %-5d |\n", val->data, id);
+                    val = val->next;
+                }
+            }
+        }
+    }
+}
+
+void print_tree(FILE *fout, struct words *head, int total) {
+    if(fout == NULL || head == NULL)
+        return ;
+    
+    table = calloc(total, sizeof(struct hash_tab*)); //получает элементы и их размер
+    _print_tree(head, total);
+    print_table(fout, total);
+    return;   
 }
 
 char *readfile(char *filename) {
@@ -29,7 +87,6 @@ char *readfile(char *filename) {
         rewind(fp); //возвращает указатель обратно к началу
         str = malloc(size + 1);
         fread(str,size,1,fp); //Fread читает весь файл и сохраняет его в файле. 1 означает, что он считывает весь файл как один блок
-        fclose(fp);
     }
     return str;
 }
@@ -57,4 +114,3 @@ struct words *bintree(struct words **head,char *word) {
     return *head;
 
 } 
-
