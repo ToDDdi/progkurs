@@ -28,16 +28,12 @@ if (argc != 3) {
             head = bintree(&head, word);
         }
         FILE *outputfile = fopen(argv[2], "w+");
-        printf("Количество слов всего = %d\n",total);
-        //fprintf(outputfile, "|%-20s | %-5s |\n%25s\n","WORDS","freq","|============================");
-       // for (i = 0; i <=total; i++) {
-        print_tree(head);
-        //fprintf(outputfile, "|%-20s | %-5d |\n",head->word,head->count);
-    //}
+        if (outputfile)
+        {
+        fprintf(outputfile, "Количество слов всего = %d\n", total);
+        print_tree(outputfile, head, total);
+        fclose(outputfile);
+        }
 }
     return 0;
 }
-
-/*To compile the file just do gcc -o frequency frequency.c
-
-To run the file, just do ./frequency  the-name-of-the-file-you-want-to-count-the-words*/
